@@ -25,6 +25,9 @@ plugins:
 ```
 
 3. Add a Golangci-lint configuration file .golangci.yml in root of the project 
+
+configure enabled-rules 
+
 ```yaml
 #Example
 version: "2"
@@ -45,10 +48,10 @@ linters:
             - english
             - no-special
             - no-sensitive
-        sensitive-patterns:
-          - "api_key"
-          - "password"
-          - "token"
+          sensitive-patterns:
+            - "api_key"
+            - "password"
+            - "token"
 
 ```
 

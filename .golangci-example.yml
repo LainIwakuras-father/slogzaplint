@@ -4,10 +4,10 @@ version: "2"
 linters:
   default: none
   enable:
-    - loglint  
+    - slogzaplint  
   settings:
     custom:
-      loglint:
+      slogzaplint:
         type: "module"
         description: This is an standart message logs usage of a plugin linter.
         original-url: "https://github.com/LainIwakuras-father/slogzaplint"
