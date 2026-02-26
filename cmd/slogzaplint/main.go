@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/LainIwakuras-father/loglint/pkg/analyzer"
-	"github.com/LainIwakuras-father/loglint/pkg/config"
+	"github.com/LainIwakuras-father/slogzaplint/pkg/analyzer"
+	"github.com/LainIwakuras-father/slogzaplint/pkg/config"
 	"golang.org/x/tools/go/analysis/singlechecker"
 )
 

@@ -1,21 +1,30 @@
-# slogzaplint 
-Custom plugin module for 'golangci-lint' standardization of messages in logs
+# slogzaplint🔍 
 
-## Assembly and Launch Instructions
+**slogzaplint** - custom plugin module for 'golangci-lint' standardization of messages in logs. It supports most popular LogLib - "log/slog", "go.uber.org/zap"
 
-### Locally 
+## 📦 Installation and usage
+
+### locally <D-F2>(without golangci-lint) 
 ```bash
-git clone https://gitlab.com/LainIwakuras-father/slogzaplint.git
+git clone https://gitlab.com/lainiwakuras-father/slogzaplint.git
 cd slogzaplint
-go run ./cmd/slogzaplint/main.go  $PATH_YOUR_PROJECT
+go run ./cmd/slogzaplint/main.go  $path_your_project
 ```
-### As plugin golangci-lint
-
-
+### As a golangci-lint plugin module (recommended)
 
 1. Install [golangci-lint](https://golangci-lint.run/docs/welcome/install/local/)
 
-2. add file .golangci.yml your project and configure 
+2. Add a plugin configuration file .custom-gcl in root of the project
+```yaml
+#Example
+version: v2.10.1
+plugins:
+  - module: 'github.com/lainiwakuras-father/slogzaplint'
+    import: 'github.com/lainiwakuras-father/slogzaplint/pkg/analyzer'
+    version: main
+```
+
+3. Add a Golangci-lint configuration file .golangci.yml in root of the project 
 ```yaml
 #Example
 version: "2"
@@ -28,8 +37,8 @@ linters:
     custom:
       slogzaplint:
         type: "module"
-        description: This is an logging usage of a plugin linter.
-        original-url: "https://github.com/LainIwakuras-father/slogzaplint"
+        description: This is an standart message logs usage of a plugin linter.
+        original-url: "https://github.com/lainiwakuras-father/slogzaplint"
         settings:
           enabled-rules:
             - lowercase
@@ -38,71 +47,87 @@ linters:
             - no-sensitive
         sensitive-patterns:
           - "api_key"
-
-```
-. add file .custom-gcl your project and configure
-```yaml
-version: v2.10.1
-plugins:
-  - module: 'github.com/LainIwakuras-father/slogzaplint'
-    import: 'github.com/LainIwakuras-father/slogzaplint/pkg/analyzer'
-    path: path/to/plugin_lint
+          - "password"
+          - "token"
 
 ```
 
-4. build binary + plugin slogzaplint
+4. build the custom linter binary
 ```bash
-cd path/to/plugin_lint
-golangci-lint custom -v
-cp custom-gcl path/to/your_project
+cd /path/to/your_project
+golangci-lint custom --name your_name --destination /your/path/
 ```
-5. run linter (optional, move binary file ./custom-gcl in directory with your project)
+5. 
 ```bash
 ./custom-gcl run main.go
-``` 
+```
+6. (Optional), Integrate with github action
+
+Add the following job to your .github/workflows/ci.yml to run the linter automatically
+
+```
+ lint:
+    name:  Lint with slogzaplint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version: stable
+      - name: run golangci-lint (with custom plugin)
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.10.1
+
+```
 
 
-## 📁 Project structure 
+## 📁 project structure 
 ```
 slogzaplint/
-├── cmd/                       # Standalone executable entry point
+├── cmd/                               # Standalone entry point
 │   └── slogzaplint/
-│       └── main.go            # CLI entry for running the linter directly
-├── pkg/                       # Core packages (reusable across the project)
-│   ├── analyzer/               # Main analyzer logic
-│   │   ├── analyzer.go         # Analyzer definition and run function
-│   │   ├── analyzer_test.go         # Analyzer definition and run function
-│   │   ├── checher.go         # Analyzer definition and run function
-│   │   ├── golangci.go         # Analyzer definition and run function
-│   │   ├── extractString.go          # Helpers to extract string messages from AST
-│   │   └── isLogCall.go      # Detection of log function calls
-│   ├── rules/                   # Individual lint rules
-│   │   ├── msg.go      
-│   │   ├── lowercase.go        # Rule: message starts with lowercase
-│   │   ├── english.go          # Rule: only English letters
-│   │   ├── nospecial.go        # Rule: no special chars/emojis
-│   │   └── sensitive.go        # Rule: no sensitive data
-│   ├── config/                  # Configuration handling
-│      └── config.go           # Load and validate YAML config
-├── testdata/                      # Test fixtures for analysistest
-│   ├── src/                       # Source files under test
-│       ├── slog/        
-│       │   ├── lowercase.go     
-│       │   ├── english.go     
-│       │   ├── nospecial.go  
-│       │   └── sensitive.go
-│       └── zap/             
-│           ├── lowercase.go 
-│           ├── english.go  
-│           ├── nospecial.go
-│           └── sensitive.go
-├── .gitlab-ci.yml                  # GitLab CI configuration
-├── .golangci.yml                    # Example configuration for golangci-lint
-├── .custom-gcl.yml                    # Example configuration for golangci-lint
+│       └── main.go
+├── pkg/                               # Core packages
+│   ├── analyzer/                       # Main analyzer logic
+│   │   ├── analyzer.go
+│   │   ├── analyzer_test.go
+│   │   ├── checker.go                   # AST traversal & rule application
+│   │   ├── golangci.go                   # Plugin glue code
+│   │   ├── extractstring.go               # Extracts log message from AST
+│   │   └── islogcall.go                    # Detects logging function calls
+│   ├── rules/                           # Individual lint rules
+│   │   ├── msg.go
+│   │   ├── lowercase.go
+│   │   ├── english.go
+│   │   ├── nospecial.go
+│   │   └── sensitive.go
+│   └── config/                          # Configuration loader
+│       └── config.go
+├── testdata/                            # Test fixtures for analysistest
+│   ├── src/
+│   │   ├── slog/
+│   │   │   ├── lowercase.go
+│   │   │   ├── english.go
+│   │   │   ├── nospecial.go
+│   │   │   └── sensitive.go
+│   │   └── zap/
+│   │       ├── lowercase.go
+│   │       ├── english.go
+│   │       ├── nospecial.go
+│   │       └── sensitive.go
+├── .golangci-example.yml                # Example golangci-lint config
+├── .custom-gcl-example.yml              # Example plugin config
 ├── go.mod
 ├── go.sum
-└── README.md                        # This file
+└── README.md                            # This file
 ```
+
+## HOW ITS WORK
+My project - [Valentine-VK-Bot]()
+
+CI workflows
+![Example](docs/1.jpg)
 
 ## Author 
 

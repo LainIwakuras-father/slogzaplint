@@ -4,8 +4,8 @@ import (
 	"go/ast"
 	"slices"
 
-	"github.com/LainIwakuras-father/loglint/pkg/config"
-	"github.com/LainIwakuras-father/loglint/pkg/rules"
+	"github.com/LainIwakuras-father/slogzaplint/pkg/config"
+	"github.com/LainIwakuras-father/slogzaplint/pkg/rules"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"

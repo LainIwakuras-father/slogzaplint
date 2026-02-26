@@ -2,15 +2,14 @@ package analyzer
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/LainIwakuras-father/loglint/pkg/config"
+	"github.com/LainIwakuras-father/slogzaplint/pkg/config"
 	"github.com/golangci/plugin-module-register/register"
 	"golang.org/x/tools/go/analysis"
 )
 
 func init() {
-	register.Plugin("loglint", New)
+	register.Plugin("slogzaplint", New)
 }
 
 type plugin struct {
@@ -21,7 +20,6 @@ var _ register.LinterPlugin = (*plugin)(nil)
 
 func New(settings any) (register.LinterPlugin, error) {
 	p := &plugin{
-		// Начинаем с пустой конфигурации, чтобы потом полностью перезаписать из конфига
 		cfg: &config.Config{
 			EnabledRules:      []string{},
 			SensitivePatterns: []string{},
@@ -34,12 +32,8 @@ func New(settings any) (register.LinterPlugin, error) {
 			return nil, fmt.Errorf("settings must be a map, got %T", settings)
 		}
 
-		// Отладка
-		fmt.Fprintf(os.Stderr, "DEBUG: raw settings: %#v\n", m)
-
-		// Парсим enabled-rules (прямо из m, без вложенного settings)
-		if rulesVal, ok := m["enabled-rules"]; ok {
-			if rulesSlice, ok := rulesVal.([]any); ok {
+		if rules, ok := m["enabled-rules"]; ok {
+			if rulesSlice, ok := rules.([]any); ok {
 				for _, r := range rulesSlice {
 					if ruleStr, ok := r.(string); ok {
 						p.cfg.EnabledRules = append(p.cfg.EnabledRules, ruleStr)
@@ -48,9 +42,8 @@ func New(settings any) (register.LinterPlugin, error) {
 			}
 		}
 
-		// Парсим sensitive-patterns
-		if patternsVal, ok := m["sensitive-patterns"]; ok {
-			if patternsSlice, ok := patternsVal.([]any); ok {
+		if patterns, ok := m["sensitive-patterns"]; ok {
+			if patternsSlice, ok := patterns.([]any); ok {
 				for _, pat := range patternsSlice {
 					if patStr, ok := pat.(string); ok {
 						p.cfg.SensitivePatterns = append(p.cfg.SensitivePatterns, patStr)
@@ -59,9 +52,7 @@ func New(settings any) (register.LinterPlugin, error) {
 			}
 		}
 
-		fmt.Fprintf(os.Stderr, "DEBUG: final config: %+v\n", p.cfg)
 	} else {
-		// Если конфиг не передан, можно использовать дефолтный
 		p.cfg = config.Default()
 	}
 

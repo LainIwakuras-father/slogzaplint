@@ -9,12 +9,17 @@ linters:
     custom:
       loglint:
         type: "module"
-        description: This is an logging usage of a plugin linter.
-        original-url: "https://github.com/LainIwakuras-father/loglint"
+        description: This is an standart message logs usage of a plugin linter.
+        original-url: "https://github.com/LainIwakuras-father/slogzaplint"
         settings:
           enabled-rules:
+            - lowercase
             - english
+            - no-special'
+            - no-sensitive
           sensitive-patterns:
             - "api_key"
+            - "password"
+            - "token"
 
 

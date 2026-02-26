@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/LainIwakuras-father/loglint/pkg/config"
+	"github.com/LainIwakuras-father/slogzaplint/pkg/config"
 	"golang.org/x/tools/go/analysis/analysistest"
 )
 

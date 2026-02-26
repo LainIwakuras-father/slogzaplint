@@ -1,4 +1,3 @@
-// checkE
 package rules
 
 import (
